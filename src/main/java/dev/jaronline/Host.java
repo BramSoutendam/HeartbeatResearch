@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -16,10 +17,11 @@ import java.util.*;
 public class Host {
     //the pong
     private static final List<InetSocketAddress> addresses = new ArrayList<>();
+    private static final Map<InetSocketAddress, Timer> pingTimers = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-        server.createContext("/join", new HostHandler(addresses));
+        server.createContext("/join", new HostJoinHandler(addresses));
         server.setExecutor(null);
         server.start();
         System.out.println("Server has started on: " + server.getAddress());
@@ -100,10 +102,10 @@ public class Host {
         }
     }
 
-    static class HostHandler implements HttpHandler {
+    static class HostJoinHandler implements HttpHandler {
         private final List<InetSocketAddress> addresses;
 
-        public HostHandler(List<InetSocketAddress> addresses) {
+        public HostJoinHandler(List<InetSocketAddress> addresses) {
             this.addresses = addresses;
         }
 

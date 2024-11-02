@@ -21,17 +21,24 @@ public class Participant {
         String port = "8080";
         String path = "join";
 
+        HttpServer server = HttpServer.create();
+        server.bind(new java.net.InetSocketAddress(8081), 0);
+        server.createContext("/ping", new ParticipantPingHandler());
+        server.setExecutor(null);
+        server.start();
+        System.out.println("Server has started on: " + server.getAddress());
+
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(URI.create("http://" + ipAddress + ":" + port + "/" + path))
                     .build();
-            HttpResponse response = httpClient.send(request, new ParticipantHandler());
+            HttpResponse response = httpClient.send(request, new ParticipantJoinHandler());
             System.out.println(response);
         }
     }
 
-    static class ParticipantHandler implements HttpResponse.BodyHandler<String> {
+    static class ParticipantJoinHandler implements HttpResponse.BodyHandler<String> {
         @Override
         public HttpResponse.BodySubscriber<String> apply(HttpResponse.ResponseInfo responseInfo) {
             HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
@@ -45,6 +52,21 @@ public class Participant {
             // await the request
             // if it doesnt reply error
             // else send another ping after some time
+        }
+    }
+
+    static class ParticipantPingHandler implements HttpHandler {
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            System.out.println("Received ping.");
+
+            // respond with pong
+            String response = "pong";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
         }
     }
 
