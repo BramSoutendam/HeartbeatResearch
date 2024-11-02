@@ -1,7 +1,12 @@
 package dev.jaronline;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,7 +29,6 @@ public class Participant {
             HttpResponse response = httpClient.send(request, new ParticipantHandler());
             System.out.println(response);
         }
-
     }
 
     static class ParticipantHandler implements HttpResponse.BodyHandler<String> {
@@ -47,17 +51,18 @@ public class Participant {
     static class Pinger {
         private int nrOfPings = 0;
         boolean expectedPongIsHere;
-        public void pingTen( int interval)throws IOException, InterruptedException{
+
+        public void pingTen(int interval) throws IOException, InterruptedException {
             long start = System.currentTimeMillis();
             expectedPongIsHere = false;
-            while(nrOfPings < 10) {
+            while (nrOfPings < 10) {
                 java.util.concurrent.TimeUnit.SECONDS.sleep(1);
-                sendPing();
-                if(expectedPongIsHere){
+                //sendPing();
+                if (expectedPongIsHere) {
                     java.util.concurrent.TimeUnit.SECONDS.sleep(interval);
                     nrOfPings++;
                     start = System.currentTimeMillis();
-                }else if (!expectedPongIsHere && start > 10000){
+                } else if (!expectedPongIsHere && start > 10000) {
                     throw new IOException();
                 }
 
@@ -68,12 +73,13 @@ public class Participant {
                 //pingTen
             }
         }
-        public boolean sendPing(){
-            try (HttpClient httpClient = HttpClient.newHttpClient()) {
-                // maak request
-                HttpRequest request = HttpRequest.newBuilder().POST()
+//        public boolean sendPing(){
+//            try (HttpClient httpClient = HttpClient.newHttpClient()) {
+//                // maak request
+//                HttpRequest request = HttpRequest.newBuilder().POST();
+//
+//            }
+//    }
 
-            }
     }
-
 }
