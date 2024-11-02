@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Host {
+    //the pong
     private static final List<InetSocketAddress> addresses = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {

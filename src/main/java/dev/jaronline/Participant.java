@@ -32,10 +32,48 @@ public class Participant {
         public HttpResponse.BodySubscriber<String> apply(HttpResponse.ResponseInfo responseInfo) {
             HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
 
-            return HttpResponse.BodySubscribers.mapping(
+            return HttpResponse.BodySubscribers.mapping( //start pinging every few seconds
                     upstream,
                     (_) -> "Hey!"
             );
+            // ping method
+            // send ad
+            // await the request
+            // if it doesnt reply error
+            // else send another ping after some time
         }
     }
+
+    static class Pinger {
+        private int nrOfPings = 0;
+        boolean expectedPongIsHere;
+        public void pingTen( int interval)throws IOException, InterruptedException{
+            long start = System.currentTimeMillis();
+            expectedPongIsHere = false;
+            while(nrOfPings < 10) {
+                java.util.concurrent.TimeUnit.SECONDS.sleep(1);
+                sendPing();
+                if(expectedPongIsHere){
+                    java.util.concurrent.TimeUnit.SECONDS.sleep(interval);
+                    nrOfPings++;
+                    start = System.currentTimeMillis();
+                }else if (!expectedPongIsHere && start > 10000){
+                    throw new IOException();
+                }
+
+                //expectPong
+                //not = exception
+                //else continue
+
+                //pingTen
+            }
+        }
+        public boolean sendPing(){
+            try (HttpClient httpClient = HttpClient.newHttpClient()) {
+                // maak request
+                HttpRequest request = HttpRequest.newBuilder().POST()
+
+            }
+    }
+
 }
